@@ -152,21 +152,21 @@ const TalentQuiz = () => {
               placeholder="نام" 
               value={userName.firstName}
               onChange={(e) => setUserName({ ...userName, firstName: e.target.value })}
-              className="w-full p-2 mb-2 border rounded-md"
+              className="w-full p-2 mb-2 border rounded-md text-black"
             />
             <input 
               type="text" 
               placeholder="نام خانوادگی" 
               value={userName.lastName}
               onChange={(e) => setUserName({ ...userName, lastName: e.target.value })}
-              className="w-full p-2 mb-2 border rounded-md"
+              className="w-full p-2 mb-2 border rounded-md text-black"
             />
             <input 
               type="text" 
               placeholder="شماره تلفن" 
               value={userName.phone}
               onChange={(e) => setUserName({ ...userName, phone: e.target.value })}
-              className="w-full p-2 mb-4 border rounded-md"
+              className="w-full p-2 mb-4 border rounded-md text-black"
             />
             <button
               onClick={handleStartQuiz}
