@@ -1,117 +1,65 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion'; 
 import { useTheme } from "@/context/ThemeContext"; 
 import supabase from '@/lib/supabase';
+import { questionsData } from './QuestionsData'; // استفاده از آرایه سوالات
 
 const TalentQuiz = () => {
-  const { isDarkMode } = useTheme(); 
-
-  const questionsData = [
-    'آیا کودک هنگام شنیدن موسیقی با دست یا پا ضرب می‌گیرد؟',
-    'آیا کودک تلاش می‌کند یک آهنگ ساده را بخواند یا تکرار کند؟',
-    'آیا صدای آلات موسیقی کودک را جذب خود می‌کند؟',
-    'آیا کودک می‌تواند تفاوت بین صدای زیر و بم را تشخیص دهد؟',
-    'آیا کودک به‌طور طبیعی ریتم‌های موسیقی را دنبال می‌کند؟',
-    'آیا کودک می‌تواند روی یک پا بایستد؟',
-    'آیا کودک در دویدن یا پریدن هماهنگ است؟',
-    'آیا کودک می‌تواند با دقت توپ را هدف بگیرد؟',
-    'آیا کودک توانایی بالارفتن از تجهیزات پارک را دارد؟',
-    'آیا در فعالیت‌هایی مثل رقصیدن با انرژی و هماهنگی حرکت می‌کند؟',
-    'آیا کودک در حل پازل‌های ساده موفق عمل می‌کند؟',
-    'آیا می‌تواند تشخیص دهد که چه شیئی کجاست؟',
-    'آیا علاقه‌مند به بازی‌های جورچین یا دسته‌بندی اشیا است؟',
-    'آیا کودک قادر است ترتیب رویدادها را بیان کند؟',
-    'آیا کودک به مرتب‌سازی و سازمان‌دهی اشیا علاقه دارد؟',
-    'آیا کودک به طراحی و نقاشی علاقه نشان می‌دهد؟',
-    'آیا کودک دوست دارد با خمیربازی اشکال بسازد؟',
-    'آیا هنگام بازی داستان یا ماجرایی برای خود می‌سازد؟',
-    'آیا کودک به رنگ‌آمیزی تصاویر و استفاده از ابزارهای هنری علاقه دارد؟',
-    'آیا اشیای معمولی را به شیوه خلاقانه‌ای استفاده می‌کند؟',
-    
-  ];
-
+  const { isDarkMode } = useTheme();
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [quizFinished, setQuizFinished] = useState(false);
   const [answers, setAnswers] = useState([]);
   const [userId, setUserId] = useState(null);
-  const [questionnaireId, setQuestionnaireId] = useState(null);
   const [userName, setUserName] = useState({ firstName: '', lastName: '', phone: '' });
+
+  // تعریف امتیازات برای هر گزینه
+  const optionScores = [4, 3, 2, 1];
 
   // ثبت کاربر و ایجاد پرسشنامه
   const handleStartQuiz = async () => {
     const userId = await saveUserToSupabase(userName);
     if (userId) {
       setUserId(userId);
-      const questionnaireId = await saveQuestionnaireToSupabase(userId);
-      if (questionnaireId) {
-        setQuestionnaireId(questionnaireId);
-        await saveQuestionsToSupabase(questionnaireId);
-      }
     }
   };
 
   // ذخیره اطلاعات کاربر در Supabase
   const saveUserToSupabase = async ({ firstName, lastName, phone }) => {
-    const { data, error } = await supabase
-      .from('users')
-      .insert([{ first_name: firstName, last_name: lastName, phone_number: phone }])
-      .select();
-    
+    const { data, error } = await supabase.from('users').insert([{ first_name: firstName, last_name: lastName, phone_number: phone }]).select();
     if (error) {
-      console.error('خطا در ذخیره کاربر:', error.message);
+      console.error('Error saving user:', error.message);
       return null;
     }
     return data[0].id;
-  };
-
-  // ایجاد یک پرسشنامه جدید
-  const saveQuestionnaireToSupabase = async (userId) => {
-    const { data, error } = await supabase
-      .from('questionnaires')
-      .insert([{ user_id: userId, questionnaire_number: Math.floor(Math.random() * 100000) }])
-      .select();
-    
-    if (error) {
-      console.error('خطا در ذخیره پرسشنامه:', error.message);
-      return null;
-    }
-    return data[0].id;
-  };
-
-  // ذخیره سوالات آزمون در Supabase
-  const saveQuestionsToSupabase = async (questionnaireId) => {
-    const questions = questionsData.map((text) => ({
-      questionnaire_id: questionnaireId,
-      question_text: text
-    }));
-
-    const { error } = await supabase.from('questions').insert(questions);
-
-    if (error) {
-      console.error('خطا در ذخیره سوالات:', error.message);
-    }
   };
 
   // ثبت پاسخ
   const handleOptionClick = (optionIndex) => {
+    const score = optionScores[optionIndex];
     setSelectedOption(optionIndex);
-    setAnswers(prev => [...prev, { questionId: currentQuestionIndex + 1, answer: optionIndex }]);
+    setAnswers(prev => [...prev, { questionId: currentQuestionIndex + 1, answer: score }]);
   };
 
+  // پیشروی به سوال بعدی
   const handleNextQuestion = async () => {
     if (selectedOption === null) {
-      alert('لطفا یک گزینه انتخاب کنید!');
+      alert('Please select an option!');
       return;
     }
 
-    if (currentQuestionIndex < questionsData.length - 1) {
+    if (currentQuestionIndex < questionsData[currentSectionIndex].questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelectedOption(null);
+    } else if (currentSectionIndex < questionsData.length - 1) {
+      setCurrentSectionIndex(currentSectionIndex + 1);
+      setCurrentQuestionIndex(0);
       setSelectedOption(null);
     } else {
       setQuizFinished(true);
-      await saveAnswersToSupabase(userId, answers);
+      await saveAnswersToSupabase(userId, answers); // ذخیره پاسخ‌ها
     }
   };
 
@@ -127,19 +75,70 @@ const TalentQuiz = () => {
     const { error } = await supabase.from('answers').insert(formattedAnswers);
 
     if (error) {
-      console.error('خطا در ذخیره پاسخ‌ها:', error.message);
+      console.error('Error saving answers:', error.message);
     }
   };
 
+  // محاسبه نمرات و نمایش آن در کارنامه
+  const calculateResults = (answers) => {
+    const results = {};
+    
+    questionsData.forEach((section, sectionIndex) => {
+      let sectionScore = 0;
+      section.questions.forEach((question, questionIndex) => {
+        const answer = answers.find(a => a.questionId === questionIndex + 1);
+        if (answer) {
+          sectionScore += answer.answer;
+        }
+      });
+
+      // تفسیر نمرات هر بخش
+      if (sectionScore >= 17) {
+        results[section.section] = { result: 'استعداد بالا', score: sectionScore };
+      } else if (sectionScore >= 12) {
+        results[section.section] = { result: 'استعداد متوسط، که با تقویت می‌تواند رشد کند', score: sectionScore };
+      } else {
+        results[section.section] = { result: 'استعداد کم، اما با تمرین می‌توان مهارت را بهبود بخشید', score: sectionScore };
+      }
+    });
+
+    return results;
+  };
+
+  // نمایش کارنامه
   if (quizFinished) {
+    const results = calculateResults(answers);
+
     return (
       <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-black/60 text-white' : 'bg-white/60 text-black'}`}>
         <div className="p-8 shadow-lg rounded-lg text-center">
           <h2 className="text-2xl font-bold text-green-500">پاسخ شما ثبت شد!</h2>
+          
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold mb-4">نتایج شما:</h3>
+            {Object.keys(results).map((section, index) => (
+              <div key={index} className="mb-4">
+                <h4 className="text-lg font-semibold">{section}</h4>
+                <p>{results[section].result}</p>
+                <p className="text-lg font-bold">امتیاز: {results[section].score}</p> {/* نمایش امتیاز */}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4">
+            <button
+              onClick={() => window.location.reload()} // ریست آزمون و بارگذاری مجدد صفحه
+              className="w-full py-2 text-lg rounded-md bg-blue-500 text-white hover:bg-blue-600"
+            >
+              شروع مجدد آزمون
+            </button>
+          </div>
         </div>
       </div>
     );
   }
+
+  const currentSection = questionsData[currentSectionIndex];
 
   return (
     <div className="flex justify-center items-center px-4">
@@ -177,7 +176,7 @@ const TalentQuiz = () => {
           </div>
         ) : (
           <>
-            <h2 className="text-xl font-semibold mb-4 text-center">{`سوال ${currentQuestionIndex + 1}`}</h2>
+            <h2 className="text-xl font-semibold mb-4 text-center">{`بخش: ${currentSection.section} - سوال ${currentQuestionIndex + 1}`}</h2>
             <motion.div
               key={currentQuestionIndex}
               initial={{ opacity: 0, y: -100 }}
@@ -185,13 +184,13 @@ const TalentQuiz = () => {
               exit={{ opacity: 0, y: 100 }}
               transition={{ duration: 0.5 }}
             >
-              <h3 className="text-lg font-semibold mb-4">{questionsData[currentQuestionIndex]}</h3>
+              <h3 className="text-lg font-semibold mb-4">{currentSection.questions[currentQuestionIndex]}</h3>
               <div className="space-y-4">
                 {['خیلی زیاد', 'خوب', 'گاهی', 'به ندرت'].map((option, index) => (
                   <button
                     key={index}
-                    onClick={() => handleOptionClick(index + 1)}
-                    className={`w-full py-2 text-lg rounded-md border transition-colors duration-300 ${selectedOption === index + 1 ? 'bg-green-500 text-white' : 'bg-gray-400/80 hover:bg-green-600 hover:text-white'}`}
+                    onClick={() => handleOptionClick(index)}
+                    className={`w-full py-2 text-lg rounded-md border transition-colors duration-300 ${selectedOption === index ? 'bg-green-500 text-white' : 'bg-gray-400/80 hover:bg-green-600 hover:text-white'}`}
                   >
                     {option}
                   </button>

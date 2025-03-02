@@ -31,7 +31,7 @@ const CallToHelper = () => {
         className="bg-green-600 text-white rounded-full p-3 shadow-xl hover:scale-110 transform transition-all wave-effect" // اضافه کردن کلاس wave-effect
         onClick={toggleMenu}
       >
-        <span className="text-2xl">☕</span> {/* آیکون قهوه */}
+        <span className="text-2xl">📞</span> {/* آیکون قهوه */}
       </Button>
 
       {/* منوی باز شده */}
