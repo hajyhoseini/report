@@ -37,6 +37,38 @@
 
 
 
+.lamp {
+  font-size: 32px; /* اندازه آیکون لامپ */
+  color: yellow; /* رنگ آیکون لامپ */
+  animation: blink 2s infinite; /* انیمیشن روشن و خاموش شدن */
+  transition: all 0.3s ease;
+}
+
+/* موقعیت‌دهی دقیق برای آیکون لامپ چپ */
+.left-lamp {
+  left: 50px; /* فاصله آیکون لامپ چپ از تایتل */
+  margin-right: 8px; /* فاصله بین لامپ و عنوان */
+  animation-delay: 0s; /* آیکون چپ ابتدا روشن می‌شود */
+}
+
+/* موقعیت‌دهی دقیق برای آیکون لامپ راست */
+.right-lamp {
+  right: 50px; /* فاصله آیکون لامپ راست از تایتل */
+  margin-left: 8px; /* فاصله بین لامپ و عنوان */
+  animation-delay: 1s; /* آیکون راست با کمی تأخیر روشن می‌شود */
+}
+
+/* انیمیشن روشن و خاموش شدن */
+@keyframes blink {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
 
 
 
