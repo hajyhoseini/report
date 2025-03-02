@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useTheme } from "@/context/ThemeContext"; 
 import supabase from '@/lib/supabase';
 import { questionsData } from './QuestionsData'; // استفاده از آرایه سوالات
+import UserForm from './UserForm'; // وارد کردن کامپوننت جدید
 
 const TalentQuiz = () => {
   const { isDarkMode } = useTheme();
@@ -19,7 +20,7 @@ const TalentQuiz = () => {
   const optionScores = [4, 3, 2, 1];
 
   // ثبت کاربر و ایجاد پرسشنامه
-  const handleStartQuiz = async () => {
+  const handleStartQuiz = async (userName) => {
     const userId = await saveUserToSupabase(userName);
     if (userId) {
       setUserId(userId);
@@ -144,36 +145,7 @@ const TalentQuiz = () => {
     <div className="flex justify-center items-center px-4">
       <div className={`p-8 shadow-lg rounded-lg w-full max-w-lg ${isDarkMode ? 'bg-gray-800/60 text-white' : 'bg-white/60 text-black'}`}>
         {!userId ? (
-          <div>
-            <h2 className="text-lg font-semibold mb-4 text-center">ورود اطلاعات کاربر</h2>
-            <input 
-              type="text" 
-              placeholder="نام" 
-              value={userName.firstName}
-              onChange={(e) => setUserName({ ...userName, firstName: e.target.value })}
-              className="w-full p-2 mb-2 border rounded-md text-black"
-            />
-            <input 
-              type="text" 
-              placeholder="نام خانوادگی" 
-              value={userName.lastName}
-              onChange={(e) => setUserName({ ...userName, lastName: e.target.value })}
-              className="w-full p-2 mb-2 border rounded-md text-black"
-            />
-            <input 
-              type="text" 
-              placeholder="شماره تلفن" 
-              value={userName.phone}
-              onChange={(e) => setUserName({ ...userName, phone: e.target.value })}
-              className="w-full p-2 mb-4 border rounded-md text-black"
-            />
-            <button
-              onClick={handleStartQuiz}
-              className="w-full py-2 text-lg rounded-md bg-blue-500 text-white hover:bg-blue-600"
-            >
-              شروع آزمون
-            </button>
-          </div>
+          <UserForm onStartQuiz={handleStartQuiz} />
         ) : (
           <>
             <h2 className="text-xl font-semibold mb-4 text-center">{`بخش: ${currentSection.section} - سوال ${currentQuestionIndex + 1}`}</h2>
