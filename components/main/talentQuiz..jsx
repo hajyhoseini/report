@@ -12,14 +12,12 @@ const TalentQuiz = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [quizFinished, setQuizFinished] = useState(false);
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState([]);  // نگهداری نمرات هر بخش به صورت جداگانه
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState({ firstName: '', lastName: '', phone: '' });
 
-  // تعریف امتیازات برای هر گزینه
   const optionScores = [4, 3, 2, 1];
 
-  // ثبت کاربر و ایجاد پرسشنامه
   const handleStartQuiz = async (userName) => {
     const userId = await saveUserToSupabase(userName);
     if (userId) {
@@ -27,7 +25,6 @@ const TalentQuiz = () => {
     }
   };
 
-  // ذخیره اطلاعات کاربر در Supabase
   const saveUserToSupabase = async ({ firstName, lastName, phone }) => {
     const { data, error } = await supabase.from('users').insert([{ first_name: firstName, last_name: lastName, phone_number: phone }]).select();
     if (error) {
@@ -37,14 +34,17 @@ const TalentQuiz = () => {
     return data[0].id;
   };
 
-  // ثبت پاسخ
   const handleOptionClick = (optionIndex) => {
     const score = optionScores[optionIndex];
     setSelectedOption(optionIndex);
-    setAnswers(prev => [...prev, { questionId: currentQuestionIndex + 1, answer: score }]);
+    const currentSectionAnswers = answers[currentSectionIndex] || [];  // نمرات بخش فعلی
+    currentSectionAnswers.push({ questionId: currentQuestionIndex + 1, answer: score });
+
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentSectionIndex] = currentSectionAnswers;  // ذخیره نمرات بخش
+    setAnswers(updatedAnswers);
   };
 
-  // پیشروی به سوال بعدی
   const handleNextQuestion = async () => {
     if (selectedOption === null) {
       alert('Please select an option!');
@@ -60,18 +60,23 @@ const TalentQuiz = () => {
       setSelectedOption(null);
     } else {
       setQuizFinished(true);
-      await saveAnswersToSupabase(userId, answers); // ذخیره پاسخ‌ها
+      await saveAnswersToSupabase(userId, answers);
     }
   };
 
-  // ذخیره پاسخ‌ها در Supabase
   const saveAnswersToSupabase = async (userId, answers) => {
-    const formattedAnswers = answers.map(answer => ({
-      user_id: userId,
-      question_id: answer.questionId,
-      answer_value: answer.answer,
-      created_at: new Date().toISOString()
-    }));
+    const formattedAnswers = [];
+    answers.forEach((sectionAnswers, sectionIndex) => {
+      sectionAnswers.forEach(answer => {
+        formattedAnswers.push({
+          user_id: userId,
+          question_id: answer.questionId,
+          answer_value: answer.answer,
+          created_at: new Date().toISOString(),
+          section: questionsData[sectionIndex].section  // بخش سوالات
+        });
+      });
+    });
 
     const { error } = await supabase.from('answers').insert(formattedAnswers);
 
@@ -80,20 +85,15 @@ const TalentQuiz = () => {
     }
   };
 
-  // محاسبه نمرات و نمایش آن در کارنامه
   const calculateResults = (answers) => {
     const results = {};
-    
+
     questionsData.forEach((section, sectionIndex) => {
       let sectionScore = 0;
-      section.questions.forEach((question, questionIndex) => {
-        const answer = answers.find(a => a.questionId === questionIndex + 1);
-        if (answer) {
-          sectionScore += answer.answer;
-        }
+      answers[sectionIndex]?.forEach(answer => {
+        sectionScore += answer.answer;
       });
 
-      // تفسیر نمرات هر بخش
       if (sectionScore >= 17) {
         results[section.section] = { result: 'استعداد بالا', score: sectionScore };
       } else if (sectionScore >= 12) {
@@ -106,7 +106,6 @@ const TalentQuiz = () => {
     return results;
   };
 
-  // نمایش کارنامه
   if (quizFinished) {
     const results = calculateResults(answers);
 
@@ -114,21 +113,20 @@ const TalentQuiz = () => {
       <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-black/60 text-white' : 'bg-white/60 text-black'}`}>
         <div className="p-8 shadow-lg rounded-lg text-center">
           <h2 className="text-2xl font-bold text-green-500">پاسخ شما ثبت شد!</h2>
-          
           <div className="mt-4">
             <h3 className="text-xl font-semibold mb-4">نتایج شما:</h3>
             {Object.keys(results).map((section, index) => (
               <div key={index} className="mb-4">
                 <h4 className="text-lg font-semibold">{section}</h4>
                 <p>{results[section].result}</p>
-                <p className="text-lg font-bold">امتیاز: {results[section].score}</p> {/* نمایش امتیاز */}
+                <p className="text-lg font-bold">امتیاز: {results[section].score}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-4">
             <button
-              onClick={() => window.location.reload()} // ریست آزمون و بارگذاری مجدد صفحه
+              onClick={() => window.location.reload()} 
               className="w-full py-2 text-lg rounded-md bg-blue-500 text-white hover:bg-blue-600"
             >
               شروع مجدد آزمون

@@ -32,7 +32,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className={`w-full p-3 ${isDarkMode ? " bg-gray-400/80" : " bg-gray-600/80"} bg-cover bg-center fixed top-0 left-0 right-0 z-30`}>
+    <header className={`w-full p-3 ${isDarkMode ? " bg-orange-500" : " bg-orange-300"} bg-cover bg-center fixed top-0 left-0 right-0 z-30`}>
       {/* بخش خوشامدگویی */}
       <div className={`relative text-white text-center py-1 px-4 font-semibold text-xs sm:text-sm shadow-lg z-10 max-w-screen-lg mx-auto rounded-xl overflow-hidden`}>
         <div className="absolute top-0 left-0 w-full animate-lightning z-20"></div>
@@ -42,7 +42,7 @@ const Header = () => {
           <FaRegLightbulb className="lamp left-lamp absolute top-1/2 transform -translate-y-1/2 left-[-40px] z-50 animate-bounce" />
           
           {/* عنوان */}
-          <span className={`${isDarkMode ? "text-white bg-gray-600" : "text-black bg-white/60"} rounded-md p-2 text-md:text-3xl lg:text-5xl`} style={{ fontFamily: 'Vazir' }}>
+          <span className={`${isDarkMode ? "text-white bg-orange-300" : "text-black bg-white/60"} rounded-xl p-2 text-md:text-3xl lg:text-5xl`} style={{ fontFamily: 'Vazir' }}>
             استعداد سنجی ملل کیدز
           </span>
           
