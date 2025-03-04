@@ -59,14 +59,12 @@ const TalentQuiz = () => {
     const updatedAnswers = [...answers];
     updatedAnswers[currentSectionIndex] = currentSectionAnswers;
     setAnswers(updatedAnswers);
+
+    // بعد از انتخاب گزینه، به سوال بعدی برو
+    handleNextQuestion();
   };
 
   const handleNextQuestion = async () => {
-    if (selectedOption === null) {
-      alert('لطفاً یک گزینه انتخاب کنید!');
-      return;
-    }
-
     if (currentQuestionIndex < questionsDataOld[currentSectionIndex].questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedOption(null);
@@ -77,6 +75,17 @@ const TalentQuiz = () => {
     } else {
       setQuizFinished(true);
       await saveAnswersToSupabase(userId, answers);
+    }
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setSelectedOption(null);
+    } else if (currentSectionIndex > 0) {
+      setCurrentSectionIndex(currentSectionIndex - 1);
+      setCurrentQuestionIndex(questionsDataOld[currentSectionIndex - 1].questions.length - 1);
+      setSelectedOption(null);
     }
   };
 
@@ -147,9 +156,12 @@ const TalentQuiz = () => {
               </div>
             </motion.div>
 
-            <div className="mt-4">
-              <button onClick={handleNextQuestion} className="w-full py-2 text-lg rounded-md bg-blue-500 text-white hover:bg-blue-600">
-                سوال بعدی
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={handlePreviousQuestion}
+                className="w-full py-2 text-lg rounded-md bg-gray-500 text-white hover:bg-gray-600"
+              >
+                سوال قبلی
               </button>
             </div>
           </>
