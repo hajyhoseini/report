@@ -29,7 +29,7 @@ const geistMono = Geist_Mono({
 export default function Layout({ children }) {
   const pathname = usePathname();
   
-  const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/forget';
+  const isAuthPage = pathname === '/oldQuestions' || pathname === '/register' || pathname === '/forget';
 
   return (
     <>

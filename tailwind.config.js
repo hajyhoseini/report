@@ -26,8 +26,8 @@ module.exports = {
     
       backgroundImage: {
         'custom-image': "url('/image/login.webp')",
-        'custom-image-main': "url('/image/red.webp')",
-        'custom-image-myUser': "url('/image/userMy.webp')",
+        'custom-image-main': "url('/image/bgnew.jpg')",
+        'custom-image-myUser': "url('/image/bg7.jpeg')",
         'custom-header-img': "url('/image/headerBg.webp')",
         'custom-coffeeShop-img': "url('/image/coffeeShop.webp')",
       },
