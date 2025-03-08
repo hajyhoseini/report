@@ -7,8 +7,7 @@ import Projects from "@/components/main/Projects";
 import SidebarMain from "@/components/main/sidebarMain";
 import Tastes from "@/components/main/tastes";
 import 'typeface-pacifico';
-import CallToHelper from "@/components/detailical/callToHelper";
-import TalentQuiz from "@/components/main/talentQuiz.";
+
 import DailyReport from "@/components/main/dailyReport";
 
 export default function Home() {
