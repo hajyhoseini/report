@@ -43,7 +43,7 @@ const Header = () => {
           
           {/* عنوان */}
           <span className={`${isDarkMode ? "text-white bg-orange-300" : "text-black bg-white/60"} rounded-xl p-2 text-md:text-3xl lg:text-5xl`} style={{ fontFamily: 'Vazir' }}>
-            استعداد سنجی ملل کیدز
+          گزارش روزانه 
           </span>
           
           {/* آیکون لامپ راست */}

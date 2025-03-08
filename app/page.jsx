@@ -9,6 +9,7 @@ import Tastes from "@/components/main/tastes";
 import 'typeface-pacifico';
 import CallToHelper from "@/components/detailical/callToHelper";
 import TalentQuiz from "@/components/main/talentQuiz.";
+import DailyReport from "@/components/main/dailyReport";
 
 export default function Home() {
 
@@ -22,9 +23,9 @@ export default function Home() {
     >
    
    
-        
+        <DailyReport/>
        
-        <TalentQuiz/>
+       
         
    
     </div>
