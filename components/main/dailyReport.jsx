@@ -36,22 +36,19 @@ const DailyReport = () => {
     // اضافه کردن شیت به ورک بوک
     XLSX.utils.book_append_sheet(wb, ws, 'گزارش روزانه');
 
-    // تبدیل ورک بوک به باینری
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-    
-    // تبدیل به Base64
-    const base64File = window.btoa(wbout);
-    return base64File;
+    // ذخیره فایل اکسل به صورت محلی
+    XLSX.writeFile(wb, 'DailyReport.xlsx');
   };
 
-  const sendToWhatsApp = (base64File) => {
-    const message = `گزارش روزانه شما: \n\n لطفا این فایل اکسل را دانلود کنید.`;
-    
+  const sendToWhatsApp = () => {
+    // پیام متنی برای ارسال به واتساپ
+    const message = `گزارش روزانه شما: \n\n لطفا فایل اکسل را دانلود کنید.`;
+
+    // encodeURIComponent برای فرمت کردن پیام
     const encodedMessage = encodeURIComponent(message);
-    // در اینجا باید فایل اکسل را به صورت Base64 به لینک تبدیل کنید
-    const fileLink = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${base64File}`;
-    
-    const whatsappLink = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}%0A${fileLink}`;
+
+    // لینک ارسال پیام به واتساپ
+    const whatsappLink = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
 
     try {
       // هدایت به لینک واتساپ برای ارسال پیام
@@ -67,11 +64,11 @@ const DailyReport = () => {
     console.log("گزارش روزانه ارسال شد:", formData);
     setIsFormSubmitted(true);
 
-    // ایجاد فایل اکسل به فرمت Base64
-    const base64File = generateExcelFile(formData);
+    // ایجاد فایل اکسل
+    generateExcelFile(formData);
     
-    // ارسال فایل به واتساپ
-    sendToWhatsApp(base64File);
+    // ارسال پیام واتساپ (لینک به صورت دستی در واتساپ ارسال می‌شود)
+    sendToWhatsApp();
   };
 
   return (
